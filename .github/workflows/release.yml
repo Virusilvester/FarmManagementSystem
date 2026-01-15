@@ -10,7 +10,7 @@ on:
 env:
   DOTNET_VERSION: '9' 
   PROJECT_NAME: 'FarmManagementSystem'
-  PROJECT_PATH: 'FarmManagementSystem/FarmManagementSystem.csproj'
+  PROJECT_PATH: 'FarmManagementSystem.csproj'
 
 jobs:
   build:
