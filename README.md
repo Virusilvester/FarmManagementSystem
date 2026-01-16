@@ -436,28 +436,6 @@ farm.DisplayReport();
 
 ---
 
-## 📁 Project Structure
-
-```
-farm-management-system/
-├── src/
-│   └── Program.cs                 # Main application file (all classes)
-├── docs/
-│   ├── index.md                   # Documentation home
-│   ├── design-document.md         # OOP design documentation
-│   ├── user-guide.md              # User manual
-│   ├── api-reference.md           # API documentation
-│   ├── images/                    # Screenshots and diagrams
-│   └── _config.yml                # GitHub Pages config
-├── tests/                         # Unit tests (optional)
-├── .gitignore                     # Git ignore file
-├── README.md                      # This file
-├── LICENSE                        # MIT License
-└── FarmManagementSystem.sln       # Visual Studio solution (optional)
-```
-
----
-
 ## ✅ Requirements Met
 
 This project fulfills all specified requirements:
@@ -515,18 +493,20 @@ This project fulfills all specified requirements:
 ## 📸 Screenshots
 
 ### Main Menu
-```
+
 <p align="center">
   <img src="docs/image/image.png" alt="Farm Management System Screenshot" width="800">
 </p>
-```
+
+<p align="center"><em>Main Menu Farm Management System</em></p>
 
 ### Farm Report Example
-```
+
 <p align="center">
   <img src="docs/image/image2.png" alt="Farm Management System Screenshot" width="800">
 </p>
-```
+
+<p align="center"><em>Main console output of the Farm Management System</em></p>
 
 ---
 
