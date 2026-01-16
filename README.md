@@ -422,7 +422,7 @@ farm.DisplayReport();
 | 📘 **Design Document** | Complete OOP architecture and design decisions | [View](docs/design-document.md) |
 | 📗 **User Guide** | Step-by-step tutorials and usage instructions | [View](docs/user-guide.md) |
 | 📙 **API Reference** | Detailed class and method documentation | [View](docs/api-reference.md) |
-| 🌐 **GitHub Pages** | Online documentation website | [Visit](https://YOUR-USERNAME.github.io/farm-management-system) |
+| 🌐 **GitHub Pages** | Online documentation website | [Visit](https://virusilvester.github.io/FarmManagementSystem) |
 
 ### Key Topics Covered
 
