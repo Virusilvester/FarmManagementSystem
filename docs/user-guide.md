@@ -6,12 +6,12 @@
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR-USERNAME/farm-management-system.git
+git clone https://github.com/Virusilvester/FarmManagementSystem.git
 ```
 
 2. Navigate to the project directory:
 ```bash
-cd farm-management-system
+cd FarmManagementSystem
 ```
 
 3. Compile and run:
