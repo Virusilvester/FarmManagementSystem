@@ -1,45 +1,50 @@
 public abstract class Crop : FarmEntity
 {
-    protected int _growthDays;
-    private int _daysToMaturity;
-    private bool _isWateredToday;
+    private int growthStage;
+    private int maturityLevel;
+    private bool isHarvested;
 
-    protected Crop(string name, int daysToMaturity) : base(name)
+    protected Crop(string name, int maturityLevel) : base(name)
     {
-        _growthDays = 0;
-        _daysToMaturity = daysToMaturity;
-        _isWateredToday = false;
+        this.growthStage = 0;
+        this.maturityLevel = maturityLevel;
+        this.isHarvested = false;
     }
 
-    public abstract void Grow();
-    public abstract string Harvest();
+    public int GrowthStage => growthStage;
+    public int MaturityLevel => maturityLevel;
+    public bool IsHarvested => isHarvested;
+    public bool IsMature => growthStage >= maturityLevel;
 
-    protected void ValidateGrowth()
+    public void Grow(int days)
     {
-        if (_growthDays < _daysToMaturity)
-            throw new CropNotMatureException($"Crop needs {_daysToMaturity - _growthDays} more days to mature");
+        if (isHarvested)
+            throw new InvalidOperationException($"{Name} has already been harvested");
+        if (days <= 0)
+            throw new InvalidQuantityException("Growth days must be positive");
+        
+        growthStage += days;
+        AddAction("Grow", days);
+        Console.WriteLine($"{Name} grew {days} days. Growth: {growthStage}/{maturityLevel}");
     }
 
-    protected void Water(int amount)
+    public Product Harvest()
     {
-        if (amount <= 0)
-            throw new InvalidQuantityException("Water amount must be > 0");
-            
-        _isWateredToday = true;
+        if (isHarvested)
+            throw new CropNotMatureException($"{Name} has already been harvested");
+        if (!IsMature)
+            throw new CropNotMatureException($"{Name} is not mature yet. Growth: {growthStage}/{maturityLevel}");
+        
+        isHarvested = true;
+        Product product = Produce();
+        AddAction("Harvest", product.Quantity);
+        Console.WriteLine($"{Name} harvested! Produced {product.Quantity} units of {product.Name}");
+        return product;
     }
 
-    public override string GetStatus()
+    public override string GetInfo()
     {
-        return $"Crop {Name} (ID: {Id}) - Growth: {_growthDays}/{_daysToMaturity} days, Watered: {_isWateredToday}";
-    }
-
-    // Simulate a day passing
-    public void NewDay()
-    {
-        if (_isWateredToday)
-        {
-            _growthDays++;
-        }
-        _isWateredToday = false;
+        string status = isHarvested ? "Harvested" : (IsMature ? "Ready to Harvest" : "Growing");
+        return $"{GetType().Name} '{Name}' [ID: {Id}] - Growth: {growthStage}/{maturityLevel}, Status: {status}";
     }
 }

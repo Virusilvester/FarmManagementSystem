@@ -1,35 +1,44 @@
 public abstract class Animal : FarmEntity
 {
-    private int _hungerLevel;
-    private int _foodConsumedToday;
+    private int foodLevel;
+    private int health;
+    private const int MAX_FOOD = 100;
+    private const int MAX_HEALTH = 100;
 
-    protected Animal(string name, int hungerLevel = 50) : base(name)
+    protected Animal(string name) : base(name)
     {
-        _hungerLevel = hungerLevel;
-        _foodConsumedToday = 0;
+        this.foodLevel = 50;
+        this.health = 100;
     }
 
-    // Abstract methods
-    public abstract void Feed(int amount);
-    public abstract string MakeSound();
-    
-    // Common animal logic
-    public bool IsHungry => _hungerLevel > 30;
+    public int FoodLevel => foodLevel;
+    public int Health => health;
 
-    protected void ValidateFeedAmount(int amount)
+    public void Feed(int amount)
     {
         if (amount <= 0)
-            throw new InsufficientFoodException("Feed amount must be > 0");
+            throw new InsufficientFoodException("Feed amount must be greater than 0");
+        
+        foodLevel = Math.Min(MAX_FOOD, foodLevel + amount);
+        health = Math.Min(MAX_HEALTH, health + (amount / 2));
+        AddAction("Feed", amount);
+        Console.WriteLine($"{Name} was fed {amount} units. Food Level: {foodLevel}, Health: {health}");
     }
 
-    protected void UpdateHunger(int amount)
+    public void DecreaseFood(int amount)
     {
-        _foodConsumedToday = amount;
-        _hungerLevel = Math.Max(0, _hungerLevel - amount);
+        foodLevel = Math.Max(0, foodLevel - amount);
+        if (foodLevel < 20)
+        {
+            health = Math.Max(0, health - 10);
+            Console.WriteLine($"Warning: {Name} is hungry! Food: {foodLevel}, Health: {health}");
+        }
     }
 
-    public override string GetStatus()
+    public abstract string MakeSound();
+
+    public override string GetInfo()
     {
-        return $"Animal {Name} (ID: {Id}) - Hunger: {_hungerLevel}, Fed: {_foodConsumedToday} units today";
+        return $"{GetType().Name} '{Name}' [ID: {Id}] - Food: {foodLevel}, Health: {health}";
     }
 }

@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © 2026\r\n    ")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Farm Management System - Console Application")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3fcf23fe62bf04f09ab63a8cf4c6da1d94da1622")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+87718516f7c648ec179eee86cc0914911c468e0e")]
 [assembly: System.Reflection.AssemblyProductAttribute("FarmManagement")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FarmManagement")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

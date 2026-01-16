@@ -2,22 +2,21 @@ public class Cow : Animal
 {
     public Cow(string name) : base(name) { }
 
-    public override void Feed(int amount)
+    public override Product Produce()
     {
-        ValidateFeedAmount(amount);
-        UpdateHunger(amount);
-        AddAction("Feed", amount);
-        Console.WriteLine($"Cow {Name} fed {amount} units. Moo!");
+        if (Health < 30)
+            throw new InvalidOperationException($"{Name} is too unhealthy to produce milk");
+        if (FoodLevel < 20)
+            throw new InsufficientFoodException($"{Name} needs more food to produce milk");
+        
+        int milkAmount = Health / 10;
+        AddAction("Produce", milkAmount);
+        Console.WriteLine($"{Name} produced {milkAmount} units of milk. {MakeSound()}");
+        return new Milk(milkAmount);
     }
 
-    public override string MakeSound() => "Moooo!";
-
-    public override string Produce()
+    public override string MakeSound()
     {
-        if (IsHungry)
-            throw new Exception("Cow is too hungry to produce milk");
-        
-        AddAction("Produce", 1);
-        return "Milk";
+        return "Moooo!";
     }
 }

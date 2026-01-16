@@ -1,29 +1,40 @@
 public class Sheep : Animal
 {
-    private bool _isSheared = false;
+    private int woolGrowth;
 
-    public Sheep(string name) : base(name) { }
-
-    public override void Feed(int amount)
+    public Sheep(string name) : base(name)
     {
-        ValidateFeedAmount(amount);
-        UpdateHunger(amount);
-        AddAction("Feed", amount);
-        Console.WriteLine($"Sheep {Name} fed {amount} units. Baa!");
+        woolGrowth = 50;
     }
 
-    public override string MakeSound() => "Baaaa!";
+    public int WoolGrowth => woolGrowth;
 
-    public override string Produce()
+    public void GrowWool(int amount)
     {
-        if (IsHungry)
-            throw new Exception("Sheep is too hungry to produce wool");
-            
-        if (_isSheared)
-            throw new Exception("Sheep was already sheared this season");
+        woolGrowth = Math.Min(100, woolGrowth + amount);
+    }
 
-        _isSheared = true;
-        AddAction("Produce", 1);
-        return "Wool";
+    public override Product Produce()
+    {
+        if (woolGrowth < 50)
+            throw new InvalidOperationException($"{Name}'s wool hasn't grown enough yet (needs 50, has {woolGrowth})");
+        if (Health < 30)
+            throw new InvalidOperationException($"{Name} is too unhealthy to be sheared");
+        
+        int woolAmount = woolGrowth / 10;
+        woolGrowth = 0;
+        AddAction("Produce", woolAmount);
+        Console.WriteLine($"{Name} was sheared for {woolAmount} units of wool. {MakeSound()}");
+        return new Wool(woolAmount);
+    }
+
+    public override string MakeSound()
+    {
+        return "Baaaa!";
+    }
+
+    public override string GetInfo()
+    {
+        return base.GetInfo() + $", Wool Growth: {woolGrowth}";
     }
 }

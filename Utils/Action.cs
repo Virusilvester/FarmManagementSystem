@@ -1,18 +1,22 @@
 public class Action
 {
-    public string ActionType { get; } // Feed, Harvest, Sell
-    public DateTime Date { get; }
-    public int Quantity { get; }
+    private string actionType;
+    private DateTime date;
+    private int quantity;
 
     public Action(string actionType, int quantity)
     {
-        ActionType = actionType;
-        Date = DateTime.Now;
-        Quantity = quantity;
+        this.actionType = actionType;
+        this.date = DateTime.Now;
+        this.quantity = quantity;
     }
+
+    public string ActionType => actionType;
+    public DateTime Date => date;
+    public int Quantity => quantity;
 
     public override string ToString()
     {
-        return $"{Date:yyyy-MM-dd HH:mm} | {ActionType,-10} | Qty: {Quantity,3}";
+        return $"[{date:yyyy-MM-dd HH:mm}] {actionType} - Quantity: {quantity}";
     }
 }

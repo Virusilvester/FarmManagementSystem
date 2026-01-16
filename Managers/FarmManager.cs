@@ -1,133 +1,247 @@
 public class FarmManager
 {
-    private Dictionary<string, FarmEntity> _entities;
-    private decimal _totalProfit;
-    private int _day;
+    private string farmName;
+    private List<Animal> animals;
+    private List<Crop> crops;
+    private List<Product> inventory;
+    private decimal totalProfit;
+    private int currentDay;
 
-    public FarmManager()
+    public FarmManager(string farmName)
     {
-        _entities = new Dictionary<string, FarmEntity>();
-        _totalProfit = 0m;
-        _day = 1;
+        this.farmName = farmName;
+        this.animals = new List<Animal>();
+        this.crops = new List<Crop>();
+        this.inventory = new List<Product>();
+        this.totalProfit = 0;
+        this.currentDay = 1;
     }
 
-    public void AddEntity(FarmEntity entity)
+    public string FarmName => farmName;
+    public decimal TotalProfit => totalProfit;
+    public int CurrentDay => currentDay;
+
+    public void AddAnimal(Animal animal)
     {
-        _entities[entity.Id] = entity;
-        Console.WriteLine($"Added {entity.GetType().Name}: {entity.Name} (ID: {entity.Id})");
+        animals.Add(animal);
+        Console.WriteLine($"Added {animal.GetType().Name} '{animal.Name}' to the farm.");
     }
 
-    public void FeedAnimal(string id, int amount)
+    public void AddCrop(Crop crop)
     {
-        if (!_entities.ContainsKey(id))
-            throw new KeyNotFoundException("Animal not found");
-            
-        var animal = _entities[id] as Animal;
+        crops.Add(crop);
+        Console.WriteLine($"Planted {crop.GetType().Name} '{crop.Name}' on the farm.");
+    }
+
+    public void FeedAllAnimals(int foodAmount)
+    {
+        Console.WriteLine("\n--- Feeding All Animals ---");
+        foreach (var animal in animals)
+        {
+            try
+            {
+                animal.Feed(foodAmount);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error feeding {animal.Name}: {ex.Message}");
+            }
+        }
+    }
+
+    public void FeedAnimal(string name, int amount)
+    {
+        var animal = animals.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         if (animal == null)
-            throw new InvalidOperationException("Entity is not an animal");
-            
-        animal.Feed(amount);
+        {
+            Console.WriteLine($"Animal '{name}' not found.");
+            return;
+        }
+        
+        try
+        {
+            animal.Feed(amount);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 
-    public void GrowCrop(string id)
+    public void ProduceFromAllAnimals()
     {
-        if (!_entities.ContainsKey(id))
-            throw new KeyNotFoundException("Crop not found");
-            
-        var crop = _entities[id] as Crop;
+        Console.WriteLine("\n--- Producing from All Animals ---");
+        foreach (var animal in animals)
+        {
+            try
+            {
+                Product product = animal.Produce();
+                AddToInventory(product);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error producing from {animal.Name}: {ex.Message}");
+            }
+        }
+    }
+
+    public void GrowAllCrops(int days)
+    {
+        Console.WriteLine($"\n--- Growing All Crops ({days} days) ---");
+        foreach (var crop in crops.Where(c => !c.IsHarvested))
+        {
+            try
+            {
+                crop.Grow(days);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error growing {crop.Name}: {ex.Message}");
+            }
+        }
+    }
+
+    public void HarvestCrop(string name)
+    {
+        var crop = crops.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         if (crop == null)
-            throw new InvalidOperationException("Entity is not a crop");
-            
-        crop.Grow();
+        {
+            Console.WriteLine($"Crop '{name}' not found.");
+            return;
+        }
+        
+        try
+        {
+            Product product = crop.Harvest();
+            AddToInventory(product);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 
-    public string HarvestCrop(string id)
+    public void HarvestAllMatureCrops()
     {
-        if (!_entities.ContainsKey(id))
-            throw new KeyNotFoundException("Crop not found");
-            
-        var crop = _entities[id] as Crop;
-        if (crop == null)
-            throw new InvalidOperationException("Entity is not a crop");
-            
-        string product = crop.Harvest();
-        Console.WriteLine($"Harvested {product} from {crop.Name}");
-        return product;
+        Console.WriteLine("\n--- Harvesting All Mature Crops ---");
+        foreach (var crop in crops.Where(c => c.IsMature && !c.IsHarvested).ToList())
+        {
+            try
+            {
+                Product product = crop.Harvest();
+                AddToInventory(product);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error harvesting {crop.Name}: {ex.Message}");
+            }
+        }
     }
 
-    public decimal SellProduct(string cropId, int quantity)
+    private void AddToInventory(Product product)
     {
-        if (!_entities.ContainsKey(cropId))
-            throw new KeyNotFoundException("Crop not found");
+        var existing = inventory.FirstOrDefault(p => p.GetType() == product.GetType());
+        if (existing != null)
+        {
+            existing.SetQuantity(existing.Quantity + product.Quantity);
+        }
+        else
+        {
+            inventory.Add(product);
+        }
+        Console.WriteLine($"Added {product.Quantity} units of {product.Name} to inventory.");
+    }
+
+    public void SellProduct(string productName, int quantity)
+    {
+        var product = inventory.FirstOrDefault(p => p.Name.Equals(productName, StringComparison.OrdinalIgnoreCase));
+        if (product == null)
+        {
+            Console.WriteLine($"Product '{productName}' not found in inventory.");
+            return;
+        }
+        
+        try
+        {
+            decimal profit = product.Sell(quantity);
+            totalProfit += profit;
+            Console.WriteLine($"Sold {quantity} units of {productName} for K{profit:F2}. Total profit: K{totalProfit:F2}");
             
-        var sellable = _entities[cropId] as Sellable;
-        if (sellable == null)
-            throw new InvalidOperationException("Entity cannot be sold");
-            
-        decimal profit = sellable.Sell(quantity);
-        _totalProfit += profit;
-        Console.WriteLine($"Sold {quantity} units for {profit:C}. Total profit: {_totalProfit:C}");
-        return profit;
+            if (product.Quantity == 0)
+                inventory.Remove(product);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 
     public void SimulateDay()
     {
-        Console.WriteLine($"\n========== DAY {_day++} SIMULATION ==========");
+        Console.WriteLine($"\n========== DAY {currentDay} SIMULATION ==========");
         
-        // Auto-grow crops
-        foreach (var entity in _entities.Values)
+        // Animals lose food over time
+        foreach (var animal in animals)
         {
-            if (entity is Crop crop)
-            {
-                crop.NewDay();
-                Console.WriteLine($"{crop.Name} grew. {crop.GetStatus()}");
-            }
+            animal.DecreaseFood(10);
         }
-
-        // Auto-feed animals (basic simulation)
-        foreach (var entity in _entities.Values)
+        
+        // Sheep grow wool
+        foreach (var sheep in animals.OfType<Sheep>())
         {
-            if (entity is Animal animal && animal.IsHungry)
-            {
-                try
-                {
-                    animal.Feed(10);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Could not feed {animal.Name}: {ex.Message}");
-                }
-            }
+            sheep.GrowWool(5);
         }
+        
+        currentDay++;
+        Console.WriteLine($"Day {currentDay - 1} completed. New day begins.\n");
     }
 
     public void DisplayReport()
     {
-        Console.WriteLine("\n========== FARM REPORT ==========");
-        Console.WriteLine($"Total Profit: {_totalProfit:C}");
-        Console.WriteLine($"Day: {_day}");
-        Console.WriteLine($"\nAnimals:");
+        Console.WriteLine($"\n{'=',60}");
+        Console.WriteLine($"FARM REPORT - {farmName.ToUpper()}");
+        Console.WriteLine($"{'=',60}");
+        Console.WriteLine($"Current Day: {currentDay}");
+        Console.WriteLine($"Total Profit: K{totalProfit:F2}");
         
-        foreach (var entity in _entities.Values.Where(e => e is Animal))
+        Console.WriteLine($"\n--- ANIMALS ({animals.Count}) ---");
+        if (animals.Count == 0)
+            Console.WriteLine("No animals on the farm.");
+        foreach (var animal in animals)
         {
-            Console.WriteLine($"  - {entity.GetStatus()}");
-            Console.WriteLine($"    Sound: {((Animal)entity).MakeSound()}");
-            Console.WriteLine($"    Recent Actions:");
-            foreach (var action in entity.ActionHistory.TakeLast(3))
-            {
-                Console.WriteLine($"      * {action}");
-            }
+            Console.WriteLine($"  {animal.GetInfo()}");
         }
-
-        Console.WriteLine($"\nCrops:");
-        foreach (var entity in _entities.Values.Where(e => e is Crop))
+        
+        Console.WriteLine($"\n--- CROPS ({crops.Count}) ---");
+        if (crops.Count == 0)
+            Console.WriteLine("No crops planted.");
+        foreach (var crop in crops)
         {
-            Console.WriteLine($"  - {entity.GetStatus()}");
-            Console.WriteLine($"    Recent Actions:");
-            foreach (var action in entity.ActionHistory.TakeLast(3))
-            {
-                Console.WriteLine($"      * {action}");
-            }
+            Console.WriteLine($"  {crop.GetInfo()}");
         }
+        
+        Console.WriteLine($"\n--- INVENTORY ({inventory.Count} product types) ---");
+        if (inventory.Count == 0)
+            Console.WriteLine("Inventory is empty.");
+        foreach (var product in inventory)
+        {
+            Console.WriteLine($"  {product}");
+        }
+        
+        Console.WriteLine($"\n--- RECENT ACTIONS ---");
+        var allEntities = animals.Cast<FarmEntity>().Concat(crops.Cast<FarmEntity>()).ToList();
+        var recentActions = allEntities
+            .SelectMany(e => e.GetActionHistory().Select(a => new { Entity = e.Name, Action = a }))
+            .OrderByDescending(x => x.Action.Date)
+            .Take(15);
+        
+        if (!recentActions.Any())
+            Console.WriteLine("No actions recorded yet.");
+        foreach (var item in recentActions)
+        {
+            Console.WriteLine($"  {item.Entity}: {item.Action}");
+        }
+        
+        Console.WriteLine($"{'=',60}\n");
     }
 }

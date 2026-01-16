@@ -1,33 +1,37 @@
 public abstract class FarmEntity
 {
-    private static int _idCounter = 0;
-    private string _id;
-    private string _name;
-    private List<Action> _actionHistory;
+    private static int nextId = 1;
+    private string id;
+    private string name;
+    private List<Action> actionHistory;
 
     protected FarmEntity(string name)
     {
-        _id = GenerateId();
-        _name = name;
-        _actionHistory = new List<Action>();
+        this.id = "FE" + (nextId++);
+        this.name = name;
+        this.actionHistory = new List<Action>();
     }
 
-    private static string GenerateId()
-    {
-        return $"ENT{++_idCounter:D4}";
-    }
-
-    // Getters (no setters for id)
-    public string Id => _id;
-    public string Name => _name;
+    public string Id => id;
+    public string Name => name;
     
-    public IReadOnlyList<Action> ActionHistory => _actionHistory.AsReadOnly();
+    public void SetName(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("Name cannot be empty");
+        name = value;
+    }
 
     protected void AddAction(string actionType, int quantity)
     {
-        _actionHistory.Add(new Action(actionType, quantity));
+        actionHistory.Add(new Action(actionType, quantity));
     }
 
-    public abstract string Produce();
-    public abstract string GetStatus();
+    public List<Action> GetActionHistory()
+    {
+        return new List<Action>(actionHistory);
+    }
+
+    public abstract Product Produce();
+    public abstract string GetInfo();
 }

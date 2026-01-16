@@ -2,22 +2,21 @@ public class Chicken : Animal
 {
     public Chicken(string name) : base(name) { }
 
-    public override void Feed(int amount)
+    public override Product Produce()
     {
-        ValidateFeedAmount(amount);
-        UpdateHunger(amount);
-        AddAction("Feed", amount);
-        Console.WriteLine($"Chicken {Name} fed {amount} units. Cluck!");
+        if (Health < 30)
+            throw new InvalidOperationException($"{Name} is too unhealthy to lay eggs");
+        if (FoodLevel < 15)
+            throw new InsufficientFoodException($"{Name} needs more food to lay eggs");
+        
+        int eggAmount = Math.Max(1, Health / 20);
+        AddAction("Produce", eggAmount);
+        Console.WriteLine($"{Name} laid {eggAmount} eggs. {MakeSound()}");
+        return new Eggs(eggAmount);
     }
 
-    public override string MakeSound() => "Cluck cluck!";
-
-    public override string Produce()
+    public override string MakeSound()
     {
-        if (IsHungry)
-            throw new Exception("Chicken is too hungry to lay eggs");
-            
-        AddAction("Produce", 3); // 3 eggs
-        return "Eggs";
+        return "Cluck cluck!";
     }
 }
