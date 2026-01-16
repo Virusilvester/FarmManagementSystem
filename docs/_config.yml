@@ -1,0 +1,9 @@
+title: Farm Management System
+description: A comprehensive OOP demonstration in C#
+theme: jekyll-theme-cayman
+# Alternative themes:
+# - jekyll-theme-minimal
+# - jekyll-theme-slate
+# - jekyll-theme-architect
+
+markdown: kramdown
