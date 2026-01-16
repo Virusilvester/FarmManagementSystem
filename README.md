@@ -237,8 +237,8 @@ classDiagram
 
 ### Clone Repository
 ```bash
-git clone https://github.com/YOUR-USERNAME/farm-management-system.git
-cd farm-management-system
+git clone https://github.com/Virusilvester/FarmManagementSystem.git
+cd FarmManagementSystem
 ```
 
 ### Build & Run
